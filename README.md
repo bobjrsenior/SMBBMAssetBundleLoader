@@ -18,7 +18,7 @@ This plugin uses [BepInEx](https://github.com/BepInEx/BepInEx) as a mod loader s
 
 ## Install Plugin Dependencies
 
-1. Install SMBBM Leaderboard Disabler TODO
+1. Install [SMBBM Leaderboard Disabler](https://github.com/bobjrsenior/SMBBMLeaderboardDisabler/releases)
 
 ## Installing This Plugin
 

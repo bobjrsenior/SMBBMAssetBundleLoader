@@ -19,9 +19,19 @@ namespace SMBBMAssetBundleLoader
         internal static new ManualLogSource Log;
 
         /// <summary>
+        /// The directory that plugin user data is stored in
+        /// </summary>
+        public static readonly string userDataDir = $"{Paths.GameRootPath}{Path.DirectorySeparatorChar}UserData";
+
+        /// <summary>
+        /// The name of this plugins data directory
+        /// </summary>
+        public static readonly string dataDirName = "AssetBundles";
+
+        /// <summary>
         /// The directory that data for this Plugin is expected
         /// </summary>
-        public static readonly string dataDir = $"{Paths.GameRootPath}{Path.DirectorySeparatorChar}UserData{Path.DirectorySeparatorChar}AssetBundles";
+        public static readonly string dataDir = $"{userDataDir}{Path.DirectorySeparatorChar}{dataDirName}";
 
         /// <summary>
         /// A Key/Value map of AssetBundles to patch
@@ -34,6 +44,19 @@ namespace SMBBMAssetBundleLoader
         public override void Load()
         {
             Plugin.Log = base.Log;
+
+            // Make sure the UserData and plugin data directories exist
+            // The exists check isn't needed but is included for logging purposes
+            if(!Directory.Exists(userDataDir))
+            {
+                Directory.CreateDirectory(userDataDir);
+                Log.LogInfo("Created UserData folder since it didn't already exist");
+            }
+            if (!Directory.Exists(dataDir))
+            {
+                Directory.CreateDirectory(dataDir);
+                Log.LogInfo($"Created {userDataDir} folder since it didn't already exist");
+            }
 
             // Find and load all the AssetBundle configuration JSON files
             assetBundles = new Dictionary<string, string>();
