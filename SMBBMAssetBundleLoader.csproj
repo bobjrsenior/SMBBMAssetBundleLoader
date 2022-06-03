@@ -36,8 +36,14 @@
       <Private>False</Private>
     </Reference>
   </ItemGroup>
+  
+  <ItemGroup>
+    <None Update="Newtonsoft.Json.LICENSE.md">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy &quot;$(TargetDir)*.dll&quot; &quot;$(SMBBMDir)\BepInEx\plugins&quot; /y" />
+    <Exec Command="xcopy &quot;$(TargetDir)*.dll&quot; &quot;$(TargetDir)$(AssemblyName)&quot; /y /i&#xD;&#xA;xcopy &quot;$(TargetDir)*.md&quot; &quot;$(TargetDir)$(AssemblyName)&quot; /y /i&#xD;&#xA;xcopy &quot;$(TargetDir)$(AssemblyName)\*.*&quot; &quot;$(SMBBMDir)\BepInEx\plugins\$(AssemblyName)&quot; /y /i" />
   </Target>
 </Project>
