@@ -22,9 +22,8 @@ This plugin uses [BepInEx](https://github.com/BepInEx/BepInEx) as a mod loader s
 
 ## Installing This Plugin
 
-1. Download the Plugin from the Releases page
-2. Extract the downloaded zip file
-3. Put the SMBBMAssetBundleLoader folder from the zip contents in your BepInEx/plugins folder
+1. Download the SMBBMAssetBundleLoader.zip file from the Releases page
+2. Extract it in your main game folder (the zip file structure should put the plugin in the right place)
 
 ## Plugin Contents
 
