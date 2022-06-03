@@ -84,3 +84,7 @@ I use Visual Studio 2022  for development although I beleive it can also be comp
 ## Configuration
 
 In the .csproj, there is an element called `<SMBBMDir>`. You should edit this to point to your game installation. The project references are determined based on that. You will need to have run your game at least once with BepInEx installed for the references to be populated on disk.
+
+## Post-build event
+
+The project includes Post-build events that will automatically copy the plugin into "$(SMBBMDir)\BepInEx\plugins". That way you can immediately run the game after building is complete for testing.
