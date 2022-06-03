@@ -75,10 +75,13 @@ Going into more detail, here are descriptions for each field in the configuratio
 | file_format_version | Always 1. This will be used if the configuration format is changed in the future for possible backwards compatability |
 | asset_bundles       | A dictionary of key value pairs. Each Key should be the name of an existing SMBBM AssetBundle (ex: "stage_smb1_bonus_st1091"). Each value should be the relative path to your replacement bundle. Example: If your replacement bundle for "stage_smb1_bonus_st1091" was "UserData/AssetBundles/MyAwesomeAssets/my_custom_asset_bundle_name_1", you would put `"stage_smb1_bonus_st1091": "MyAwesomeAssets/my_custom_asset_bundle_name_1"` for one of the entries |
 
-To test the mod and create an example of a larger asset pack, I created a configuration file for iswimfly's [Invisiball mod](https://gamebanana.com/mods/367723) [here](https://gist.github.com/bobjrsenior/68975daaef0737fa2e5a39289d747c60).
+## Example Configuration
 
-The configuration should go in the "UserData\AssetBundles" folder. Then copy the "Invisiball BM" folder from Invisiball's release to "UserData\AssetBundles" as well. When you start the game, the mod will then patch in all of the mods custom bundles.
+To test the mod and create an example of a larger asset pack, I created a [configuration file](https://gist.github.com/bobjrsenior/68975daaef0737fa2e5a39289d747c60) for iswimfly's [Invisiball mod](https://gamebanana.com/mods/367723).
 
+1. Copy the configuration file in "UserData\AssetBundles" 
+2. Copy the "Invisiball BM" folder from Invisiball's release to "UserData\AssetBundles"
+3. Start the game and it should patch in all of the Invisiball custom assets
 
 ## Building
 
