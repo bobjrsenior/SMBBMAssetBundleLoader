@@ -1,11 +1,11 @@
 ﻿using BepInEx;
 using BepInEx.IL2CPP;
 using BepInEx.Logging;
+using HarmonyLib;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.IO;
-using HarmonyLib;
 
 namespace SMBBMAssetBundleLoader
 {
@@ -42,18 +42,23 @@ namespace SMBBMAssetBundleLoader
                 LoadJSONFile(file);
             }
             Log.LogDebug("Done loading json files");
-            
+
             // Log the final AssetBundle key/value set for debugging use
-            string dict = "";
-            foreach (KeyValuePair<string, string> assetBundle in assetBundles)
+            // Also make sure we don't waste time processing here if we don't log it
+            if (Logger.ListenedLogLevels >= LogLevel.Debug)
             {
-                dict += $"\"{assetBundle.Key}\", \"{assetBundle.Value}\"\n";
+                string dict = "";
+                foreach (KeyValuePair<string, string> assetBundle in assetBundles)
+                {
+                    dict += $"\"{assetBundle.Key}\", \"{assetBundle.Value}\"\n";
+                }
+                Log.LogDebug($"Final Asset Bundle List JSON is {{{dict}}}");
             }
-            Log.LogDebug($"Final Asset Bundle List JSON is {{{dict}}}");
+
 
             // If we are patching something, make sure to disable the leaderboards
             // Will probably need something more complicated in the future (i.e. should UI patches disable it?)
-            if(assetBundles.Count > 0)
+            if (assetBundles.Count > 0)
             {
                 SMBBMLeaderboardDisabler.Plugin.DisableLeaderboards(PluginInfo.PLUGIN_NAME);
             }
