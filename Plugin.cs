@@ -7,7 +7,7 @@ using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.IO;
 
-namespace SMBBMAssetBundleLoader
+namespace SMBBMFileRedirector
 {
     [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
     [BepInDependency(SMBBMLeaderboardDisabler.PluginInfo.PLUGIN_GUID, BepInDependency.DependencyFlags.HardDependency)]
@@ -61,7 +61,7 @@ namespace SMBBMAssetBundleLoader
 
             // Make sure the UserData and plugin data directories exist
             // The exists check isn't needed but is included for logging purposes
-            if(!Directory.Exists(userDataDir))
+            if (!Directory.Exists(userDataDir))
             {
                 Directory.CreateDirectory(userDataDir);
                 Log.LogInfo("Created UserData folder since it didn't already exist");

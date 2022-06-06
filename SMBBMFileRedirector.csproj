@@ -1,0 +1,53 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>netstandard2.1</TargetFramework>
+		<AssemblyName>SMBBMFileRedirector</AssemblyName>
+		<BepInExPluginGuid>com.bobjrsenior.SMBBMFileRedirector</BepInExPluginGuid>
+		<Description>A plugin to help with loading custom asset files without modifying base game assets. It works by redirecting the games to load files in a different location.</Description>
+		<Version>2.0.0</Version>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<LangVersion>latest</LangVersion>
+		<SMBBMDir>Z:\smbbm</SMBBMDir>
+		<CopyLocalLockFileAssemblies>True</CopyLocalLockFileAssemblies>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="BepInEx.IL2CPP" Version="6.0.0-*" IncludeAssets="compile" />
+		<PackageReference Include="BepInEx.PluginInfoProps" Version="1.*" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Reference Include="Assembly-CSharp">
+			<HintPath>$(SMBBMDir)\BepInEx\unhollowed\Assembly-CSharp.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="Assembly-CSharp">
+			<HintPath>$(SMBBMDir)\BepInEx\unhollowed\Assembly-CSharp-firstpass.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="Il2Cppmscorlib">
+			<HintPath>$(SMBBMDir)\BepInEx\unhollowed\Il2Cppmscorlib.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="SMBBMLeaderboardDisabler">
+			<HintPath>Z:\smbbm\BepInEx\plugins\SMBBMLeaderboardDisabler.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="UnityEngine.CoreModule">
+			<HintPath>$(SMBBMDir)\BepInEx\unhollowed\UnityEngine.CoreModule.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Update="Newtonsoft.Json.LICENSE.md">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+		<Exec Command="xcopy &quot;$(TargetDir)*.dll&quot; &quot;$(TargetDir)$(AssemblyName)&quot; /y /i&#xD;&#xA;xcopy &quot;$(TargetDir)*.md&quot; &quot;$(TargetDir)$(AssemblyName)&quot; /y /i&#xD;&#xA;xcopy &quot;$(TargetDir)$(AssemblyName)\*.*&quot; &quot;$(SMBBMDir)\BepInEx\plugins\$(AssemblyName)&quot; /y /i" />
+	</Target>
+</Project>

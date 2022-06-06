@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SMBBMAssetBundleLoader
+namespace SMBBMFileRedirector
 {
     internal class ReplacementDef
     {

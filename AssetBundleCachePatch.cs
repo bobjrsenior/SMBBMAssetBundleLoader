@@ -1,7 +1,7 @@
 ﻿using Framework;
 using HarmonyLib;
 
-namespace SMBBMAssetBundleLoader
+namespace SMBBMFileRedirector
 {
     [HarmonyPatch(typeof(AssetBundleCache))]
     public class AssetBundleCachePatch
