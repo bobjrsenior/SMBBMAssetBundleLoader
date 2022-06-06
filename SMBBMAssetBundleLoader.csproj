@@ -23,6 +23,10 @@
       <HintPath>$(SMBBMDir)\BepInEx\unhollowed\Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
     </Reference>
+	<Reference Include="Assembly-CSharp">
+	  <HintPath>$(SMBBMDir)\BepInEx\unhollowed\Assembly-CSharp-firstpass.dll</HintPath>
+      <Private>False</Private>
+	</Reference>
     <Reference Include="Il2Cppmscorlib">
       <HintPath>$(SMBBMDir)\BepInEx\unhollowed\Il2Cppmscorlib.dll</HintPath>
       <Private>False</Private>

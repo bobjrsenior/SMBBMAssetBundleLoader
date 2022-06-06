@@ -26,7 +26,7 @@ namespace SMBBMAssetBundleLoader
         /// <summary>
         /// The name of this plugins data directory
         /// </summary>
-        public static readonly string dataDirName = "AssetBundles";
+        public static readonly string dataDirName = "FileReplacements";
 
         /// <summary>
         /// The directory that data for this Plugin is expected
@@ -39,6 +39,20 @@ namespace SMBBMAssetBundleLoader
         /// Value: Patch to Asset Bundle to patch it with
         /// </summary>
         internal static Dictionary<string, string> assetBundles;
+
+        /// <summary>
+        /// A Key/Value map of Acb audio files to patch
+        /// Key: Acb audio file name
+        /// Value: Patch to Acb audio file to patch it with
+        /// </summary>
+        internal static Dictionary<string, string> acbAudioFiles;
+
+        /// <summary>
+        /// A Key/Value map of Awb audio files to patch
+        /// Key: Awb audio file name
+        /// Value: Patch to Awb audio file to patch it with
+        /// </summary>
+        internal static Dictionary<string, string> awbAudioFiles;
 
 
         public override void Load()
@@ -60,6 +74,8 @@ namespace SMBBMAssetBundleLoader
 
             // Find and load all the AssetBundle configuration JSON files
             assetBundles = new Dictionary<string, string>();
+            acbAudioFiles = new Dictionary<string, string>();
+            awbAudioFiles = new Dictionary<string, string>();
             foreach (var file in Directory.EnumerateFiles(dataDir, "*.json", SearchOption.TopDirectoryOnly))
             {
                 LoadJSONFile(file);
@@ -76,6 +92,18 @@ namespace SMBBMAssetBundleLoader
                     dict += $"\"{assetBundle.Key}\", \"{assetBundle.Value}\"\n";
                 }
                 Log.LogDebug($"Final Asset Bundle List JSON is {{{dict}}}");
+                dict = "";
+                foreach (KeyValuePair<string, string> acbAudioFile in acbAudioFiles)
+                {
+                    dict += $"\"{acbAudioFile.Key}\", \"{acbAudioFile.Value}\"\n";
+                }
+                Log.LogDebug($"Final Acb Audio File List JSON is {{{dict}}}");
+                dict = "";
+                foreach (KeyValuePair<string, string> awbAudioFile in awbAudioFiles)
+                {
+                    dict += $"\"{awbAudioFile.Key}\", \"{awbAudioFile.Value}\"\n";
+                }
+                Log.LogDebug($"Final Awb Audio File List JSON is {{{dict}}}");
             }
 
 
@@ -106,28 +134,56 @@ namespace SMBBMAssetBundleLoader
             {
                 // Serializethe JSON file into a C# one
                 JObject obj = JToken.ReadFrom(reader) as JObject;
-                AssetBundleSettings assetBundleSettings = obj.ToObject<AssetBundleSettings>();
-                if (assetBundleSettings != null)
+                ReplacementDef replacementDef = obj.ToObject<ReplacementDef>();
+                MergeAssetBundles(replacementDef.asset_bundles);
+                MergeAcbAudioFiles(replacementDef.acb_audio_files);
+                MergeAwbAudioFiles(replacementDef.awb_audio_files);
+                Log.LogDebug($"Loaded: {replacementDef}");
+            }
+        }
+
+        /// <summary>
+        /// Merges a dictionary of AssetBundle replacements current AssetBundle Key/Value Patch mapping
+        /// </summary>
+        /// <param name="assetBundles">assetBundles to merge</param>
+        internal void MergeAssetBundles(Dictionary<string, string> newAssetBundles)
+        {
+            if (newAssetBundles != null)
+            {
+                foreach (KeyValuePair<string, string> assetBundle in newAssetBundles)
                 {
-                    MergeMusic(assetBundleSettings);
-                    Log.LogDebug($"Loaded: {assetBundleSettings}");
-                }
-                else
-                {
-                    Log.LogDebug($"Nothing to load");
+                    assetBundles[assetBundle.Key] = $"{dataDir}{Path.DirectorySeparatorChar}{assetBundle.Value}";
                 }
             }
         }
 
         /// <summary>
-        /// Merges an AssetBundleSettings object with the current AssetBundle Key/Value Patch mapping
+        /// Merges a dictionary of Acb audio file replacements current Acb Audio Key/Value Patch mapping
         /// </summary>
-        /// <param name="assetBundleSettings">AssetBundleSettings to merge</param>
-        internal void MergeMusic(AssetBundleSettings assetBundleSettings)
+        /// <param name="acbAudioFiles">Acb audio files to merge</param>
+        internal void MergeAcbAudioFiles(Dictionary<string, string> newAcbAudioFiles)
         {
-            foreach (KeyValuePair<string, string> assetBundle in assetBundleSettings.asset_bundles)
+            if (newAcbAudioFiles != null)
             {
-                assetBundles[assetBundle.Key] = $"{dataDir}{Path.DirectorySeparatorChar}{assetBundle.Value}";
+                foreach (KeyValuePair<string, string> acbAudioFile in newAcbAudioFiles)
+                {
+                    acbAudioFiles[acbAudioFile.Key] = $"{dataDir}{Path.DirectorySeparatorChar}{acbAudioFile.Value}";
+                }
+            }
+        }
+
+        /// <summary>
+        /// Merges a dictionary of Awb audio file replacements current Awb Audio Key/Value Patch mapping
+        /// </summary>
+        /// <param name="awbAudioFiles">Awb audio files to merge</param>
+        internal void MergeAwbAudioFiles(Dictionary<string, string> newAwbAudioFiles)
+        {
+            if (newAwbAudioFiles != null)
+            {
+                foreach (KeyValuePair<string, string> awbAudioFile in newAwbAudioFiles)
+                {
+                    awbAudioFiles[awbAudioFile.Key] = $"{dataDir}{Path.DirectorySeparatorChar}{awbAudioFile.Value}";
+                }
             }
         }
     }
