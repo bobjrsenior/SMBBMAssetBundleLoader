@@ -41,18 +41,20 @@ namespace SMBBMFileRedirector
         internal static Dictionary<string, string> assetBundles;
 
         /// <summary>
-        /// A Key/Value map of Acb audio files to patch
-        /// Key: Acb audio file name
-        /// Value: Patch to Acb audio file to patch it with
+        /// A Key/Value map of CueSheets to patch
+        /// Key: Cue Sheet name
+        /// Value: Patch to Cue Sheet to patch it with
         /// </summary>
-        internal static Dictionary<string, string> acbAudioFiles;
+        internal static Dictionary<string, CueSheetDef> cueSheets;
 
         /// <summary>
-        /// A Key/Value map of Awb audio files to patch
-        /// Key: Awb audio file name
-        /// Value: Patch to Awb audio file to patch it with
+        /// A Key/Value map of Cue to CueSheets
+        /// Key: Cue name
+        /// Value: Cue Sheet to direct it to
         /// </summary>
-        internal static Dictionary<string, string> awbAudioFiles;
+        internal static Dictionary<string, string> cueToCueSheets;
+
+        internal static Dictionary<Flash2.sound_id.cuesheet, Flash2.sound_id.cuesheet> cueSheetDependency;
 
 
         public override void Load()
@@ -72,17 +74,18 @@ namespace SMBBMFileRedirector
                 Log.LogInfo($"Created {userDataDir} folder since it didn't already exist");
             }
 
-            // Find and load all the AssetBundle configuration JSON files
-            assetBundles = new Dictionary<string, string>();
-            acbAudioFiles = new Dictionary<string, string>();
-            awbAudioFiles = new Dictionary<string, string>();
+            // Find and load all the configuration JSON files
+            assetBundles = new();
+            cueSheets = new();
+            cueToCueSheets = new();
+            cueSheetDependency = new();
             foreach (var file in Directory.EnumerateFiles(dataDir, "*.json", SearchOption.TopDirectoryOnly))
             {
                 LoadJSONFile(file);
             }
             Log.LogDebug("Done loading json files");
 
-            // Log the final AssetBundle key/value set for debugging use
+            // Log the final configuration key/value set for debugging use
             // Also make sure we don't waste time processing here if we don't log it
             if (Logger.ListenedLogLevels >= LogLevel.Debug)
             {
@@ -93,17 +96,17 @@ namespace SMBBMFileRedirector
                 }
                 Log.LogDebug($"Final Asset Bundle List JSON is {{{dict}}}");
                 dict = "";
-                foreach (KeyValuePair<string, string> acbAudioFile in acbAudioFiles)
+                foreach (KeyValuePair<string, CueSheetDef> cueSheet in cueSheets)
                 {
-                    dict += $"\"{acbAudioFile.Key}\", \"{acbAudioFile.Value}\"\n";
+                    dict += $"\"{cueSheet.Key}\", {{\"{cueSheet.Value.acb}\", \"{cueSheet.Value.awb}\"}}\n";
                 }
-                Log.LogDebug($"Final Acb Audio File List JSON is {{{dict}}}");
+                Log.LogDebug($"Final Cue Sheet List JSON is {{{dict}}}");
                 dict = "";
-                foreach (KeyValuePair<string, string> awbAudioFile in awbAudioFiles)
+                foreach (KeyValuePair<string, string> cueToCueSheet in cueToCueSheets)
                 {
-                    dict += $"\"{awbAudioFile.Key}\", \"{awbAudioFile.Value}\"\n";
+                    dict += $"\"{cueToCueSheet.Key}\", \"{cueToCueSheet.Value}\"\n";
                 }
-                Log.LogDebug($"Final Awb Audio File List JSON is {{{dict}}}");
+                Log.LogDebug($"Final Cue->Cue Sheet Mapping List JSON is {{{dict}}}");
             }
 
 
@@ -115,8 +118,10 @@ namespace SMBBMFileRedirector
             }
 
             // Harmony Patching
-            var harmony = new Harmony("com.bobjrsenior.AssetBundlePatch");
+            var harmony = new Harmony("com.bobjrsenior.SMBBMFileRedirector");
             harmony.PatchAll();
+
+            AddComponent<DelayedSoundHandler>();
 
             Log.LogInfo($"Plugin {PluginInfo.PLUGIN_GUID} is loaded!");
         }
@@ -136,14 +141,14 @@ namespace SMBBMFileRedirector
                 JObject obj = JToken.ReadFrom(reader) as JObject;
                 ReplacementDef replacementDef = obj.ToObject<ReplacementDef>();
                 MergeAssetBundles(replacementDef.asset_bundles);
-                MergeAcbAudioFiles(replacementDef.acb_audio_files);
-                MergeAwbAudioFiles(replacementDef.awb_audio_files);
+                MergeCueSheets(replacementDef.cue_sheets);
+                MergeCueToCueSheets(replacementDef.cue_to_cue_sheet);
                 Log.LogDebug($"Loaded: {replacementDef}");
             }
         }
 
         /// <summary>
-        /// Merges a dictionary of AssetBundle replacements current AssetBundle Key/Value Patch mapping
+        /// Merges a dictionary of AssetBundle replacements with the current AssetBundle Key/Value Patch mapping
         /// </summary>
         /// <param name="assetBundles">assetBundles to merge</param>
         internal void MergeAssetBundles(Dictionary<string, string> newAssetBundles)
@@ -158,31 +163,36 @@ namespace SMBBMFileRedirector
         }
 
         /// <summary>
-        /// Merges a dictionary of Acb audio file replacements current Acb Audio Key/Value Patch mapping
+        /// Merges a dictionary of audio CueSheet file replacements with the current Awb Audio Key/Value Patch mapping
         /// </summary>
-        /// <param name="acbAudioFiles">Acb audio files to merge</param>
-        internal void MergeAcbAudioFiles(Dictionary<string, string> newAcbAudioFiles)
+        /// <param name="newCueSheets">Cue Sheets to merge</param>
+        internal void MergeCueSheets(Dictionary<string, CueSheetDef> newCueSheets)
         {
-            if (newAcbAudioFiles != null)
+            if (newCueSheets != null)
             {
-                foreach (KeyValuePair<string, string> acbAudioFile in newAcbAudioFiles)
+                foreach (KeyValuePair<string, CueSheetDef> cueSheet in newCueSheets)
                 {
-                    acbAudioFiles[acbAudioFile.Key] = $"{dataDir}{Path.DirectorySeparatorChar}{acbAudioFile.Value}";
+                    if (cueSheet.Value.acb != null && cueSheet.Value.acb.Length > 0)
+                        cueSheet.Value.acb = $"{dataDir}{Path.DirectorySeparatorChar}{cueSheet.Value.acb}";
+                    if (cueSheet.Value.awb != null && cueSheet.Value.awb.Length > 0)
+                        cueSheet.Value.awb = $"{dataDir}{Path.DirectorySeparatorChar}{cueSheet.Value.awb}";
+
+                    cueSheets[cueSheet.Key] = cueSheet.Value;
                 }
             }
         }
 
         /// <summary>
-        /// Merges a dictionary of Awb audio file replacements current Awb Audio Key/Value Patch mapping
+        /// Merges a dictionary of Cue->Cue Sheet mappings with the current Cue->Cue Sheet Key/Value mappings
         /// </summary>
-        /// <param name="awbAudioFiles">Awb audio files to merge</param>
-        internal void MergeAwbAudioFiles(Dictionary<string, string> newAwbAudioFiles)
+        /// <param name="newCueToCueSheet">Cue->CueSheet mappings to merge</param>
+        internal void MergeCueToCueSheets(Dictionary<string, string> newCueToCueSheet)
         {
-            if (newAwbAudioFiles != null)
+            if (newCueToCueSheet != null)
             {
-                foreach (KeyValuePair<string, string> awbAudioFile in newAwbAudioFiles)
+                foreach (KeyValuePair<string, string> cueToCueShe in newCueToCueSheet)
                 {
-                    awbAudioFiles[awbAudioFile.Key] = $"{dataDir}{Path.DirectorySeparatorChar}{awbAudioFile.Value}";
+                    cueToCueSheets[cueToCueShe.Key] = cueToCueShe.Value;
                 }
             }
         }
