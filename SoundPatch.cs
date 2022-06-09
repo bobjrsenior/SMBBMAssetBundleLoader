@@ -31,6 +31,10 @@ namespace SMBBMFileRedirector
             return true;
         }
 
+        /* 
+         * Unfortunately, Sound.UnloadCueSheet method is called in a way unsupported
+         * by BepInEx so I have to use cuesheet_param_t for unload handling instead
+         * This is kept here for now in case support gets added
         [HarmonyPrefix]
         [HarmonyPatch(nameof(Sound.UnloadCueSheet),
 new[] { typeof(sound_id.cuesheet) })]
@@ -55,6 +59,6 @@ new[] { typeof(sound_id.cuesheet) })]
                 }
             }
             return true;
-        }
+        }*/
     }
 }

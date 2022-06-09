@@ -5,7 +5,9 @@ namespace SMBBMFileRedirector
     [HarmonyPatch(typeof(CriAtomExAcbLoader))]
     public class CriAtomExAcbLoaderPatch
     {
-        /*[HarmonyPrefix]
+        /*
+         * Temporarily kept here as an example of on the fly patching of acb/awb file locations
+        [HarmonyPrefix]
         [HarmonyPatch(nameof(CriAtomExAcbLoader.LoadAcbFileAsync),
     new[] { typeof(CriFsBinder), typeof(string), typeof(string), typeof(bool) })]
         static bool LoadAcbFileAsync_bind_string_string(CriFsBinder binder, ref string acbPath, ref string awbPath, bool loadAwbOnMemory)
