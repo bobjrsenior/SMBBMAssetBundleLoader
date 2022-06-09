@@ -6,12 +6,13 @@ using UnityEngine;
 
 namespace SMBBMFileRedirector
 {
-    internal class DelayedSoundHandler : MonoBehaviour
+    internal class DelayedPatchHandler : MonoBehaviour
     {
         private readonly float startupDelay = 1.0f;
         private float curDelay = 0.0f;
         private bool initializedCueSheets = false;
         private bool initializedCues = false;
+        private bool initializedMovies = false;
 
         /// <summary>
         /// A mapping of injected Cue Sheet Enums to their Enum int value
@@ -20,7 +21,9 @@ namespace SMBBMFileRedirector
 
         void Update()
         {
-            if (!initializedCueSheets || !initializedCues)
+            // This delay is here in case all of the data isn't
+            // initialized by frame 0
+            if (!FullyInitialized())
             {
                 curDelay += Time.deltaTime;
                 if (curDelay > startupDelay)
@@ -30,8 +33,15 @@ namespace SMBBMFileRedirector
                         InitializeCueSheet();
                     if (initializedCueSheets && !initializedCues)
                         InitializeCues();
+                    if (!initializedMovies)
+                        InitializeMovies();
                 }
             }
+        }
+
+        private bool FullyInitialized()
+        {
+            return initializedCueSheets && initializedCues && initializedMovies;
         }
 
         private void InitializeCueSheet()
@@ -129,6 +139,39 @@ namespace SMBBMFileRedirector
             else
             {
                 initializedCues = false;
+            }
+        }
+
+        private void InitializeMovies()
+        {
+            initializedMovies = true;
+
+            // Try to get the games movie param
+            MovieParam movieParam = MovieManager.Instance.m_MovieParam;
+            if (movieParam != null && movieParam.m_Data != null)
+            {
+                // Get the list of movie datums from it
+                Il2CppSystem.Collections.Generic.List<MovieParam.Datum> movieDatums = movieParam.m_Data;
+                foreach (MovieParam.Datum movieDatum in movieDatums)
+                {
+                    // Go through every path in every datum...
+                    // There should only be one patch for each so who knows why it's a list...
+                    for (int i = 0; i < movieDatum.m_PathList.Count; i++)
+                    {
+                        // Check if it's in our patch list and patch if it is
+                        string path = movieDatum.m_PathList[i];
+                        if (Plugin.movies.ContainsKey(path))
+                        {
+                            movieDatum.m_PathList[i] = Plugin.movies[path];
+                            Plugin.Log.LogDebug($"Patched Movie {path} with filepath: {movieDatum.m_PathList[i]}");
+                        }
+
+                    }
+                }
+            }
+            else
+            {
+                initializedMovies = false;
             }
         }
     }

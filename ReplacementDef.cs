@@ -11,7 +11,7 @@ namespace SMBBMFileRedirector
 
         public Dictionary<string, string> asset_bundles;
         public Dictionary<string, CueSheetDef> cue_sheets;
-        public Dictionary<string, string> usm_audio_files;
         public Dictionary<string, string> cue_to_cue_sheet;
+        public Dictionary<string, string> movies;
     }
 }

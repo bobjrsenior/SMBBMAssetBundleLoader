@@ -36,14 +36,14 @@ namespace SMBBMFileRedirector
         /// <summary>
         /// A Key/Value map of AssetBundles to patch
         /// Key: Asset Bundle Name
-        /// Value: Patch to Asset Bundle to patch it with
+        /// Value: Path to the Asset Bundle to patch it with
         /// </summary>
         internal static Dictionary<string, string> assetBundles;
 
         /// <summary>
         /// A Key/Value map of CueSheets to patch
         /// Key: Cue Sheet name
-        /// Value: Patch to Cue Sheet to patch it with
+        /// Value: Path to the Cue Sheet to patch it with
         /// </summary>
         internal static Dictionary<string, CueSheetDef> cueSheets;
 
@@ -54,7 +54,19 @@ namespace SMBBMFileRedirector
         /// </summary>
         internal static Dictionary<string, string> cueToCueSheets;
 
+        /// <summary>
+        /// A depdency mapping from original Cue Sheets to injected ones
+        /// Key: Original Cue Sheet
+        /// Value: Injected Cue Sheet that holds a Cue from the original Cue Sheet
+        /// </summary>
         internal static Dictionary<Flash2.sound_id.cuesheet, Flash2.sound_id.cuesheet> cueSheetDependency;
+
+        /// <summary>
+        /// A Key/Value map of Movies to patch
+        /// Key: Movie name
+        /// Value: Path to the Movie to patch it with
+        /// </summary>
+        internal static Dictionary<string, string> movies;
 
 
         public override void Load()
@@ -79,6 +91,7 @@ namespace SMBBMFileRedirector
             cueSheets = new();
             cueToCueSheets = new();
             cueSheetDependency = new();
+            movies = new();
             foreach (var file in Directory.EnumerateFiles(dataDir, "*.json", SearchOption.TopDirectoryOnly))
             {
                 LoadJSONFile(file);
@@ -107,6 +120,12 @@ namespace SMBBMFileRedirector
                     dict += $"\"{cueToCueSheet.Key}\", \"{cueToCueSheet.Value}\"\n";
                 }
                 Log.LogDebug($"Final Cue->Cue Sheet Mapping List JSON is {{{dict}}}");
+                dict = "";
+                foreach (KeyValuePair<string, string> movie in movies)
+                {
+                    dict += $"\"{movie.Key}\", \"{movie.Value}\"\n";
+                }
+                Log.LogDebug($"Final Movie List JSON is {{{dict}}}");
             }
 
 
@@ -121,7 +140,7 @@ namespace SMBBMFileRedirector
             var harmony = new Harmony("com.bobjrsenior.SMBBMFileRedirector");
             harmony.PatchAll();
 
-            AddComponent<DelayedSoundHandler>();
+            AddComponent<DelayedPatchHandler>();
 
             Log.LogInfo($"Plugin {PluginInfo.PLUGIN_GUID} is loaded!");
         }
@@ -143,6 +162,7 @@ namespace SMBBMFileRedirector
                 MergeAssetBundles(replacementDef.asset_bundles);
                 MergeCueSheets(replacementDef.cue_sheets);
                 MergeCueToCueSheets(replacementDef.cue_to_cue_sheet);
+                MergeMovies(replacementDef.movies);
                 Log.LogDebug($"Loaded: {replacementDef}");
             }
         }
@@ -150,7 +170,7 @@ namespace SMBBMFileRedirector
         /// <summary>
         /// Merges a dictionary of AssetBundle replacements with the current AssetBundle Key/Value Patch mapping
         /// </summary>
-        /// <param name="assetBundles">assetBundles to merge</param>
+        /// <param name="newAssetBundles">assetBundles to merge</param>
         internal void MergeAssetBundles(Dictionary<string, string> newAssetBundles)
         {
             if (newAssetBundles != null)
@@ -193,6 +213,22 @@ namespace SMBBMFileRedirector
                 foreach (KeyValuePair<string, string> cueToCueShe in newCueToCueSheet)
                 {
                     cueToCueSheets[cueToCueShe.Key] = cueToCueShe.Value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Merges a dictionary of Movie replacements with the current Movie Key/Value Patch mapping
+        /// </summary>
+        /// <param name="newAssetBundles">Movies to merge</param>
+        internal void MergeMovies(Dictionary<string, string> newMovies)
+        {
+            if (newMovies != null)
+            {
+                foreach (KeyValuePair<string, string> movie in newMovies)
+                {
+                    // Prepend "Movie/" since for easier comparing with the game's internal path
+                    movies[$"Movie/{movie.Key}"] = $"{dataDir}{Path.DirectorySeparatorChar}{movie.Value}";
                 }
             }
         }
