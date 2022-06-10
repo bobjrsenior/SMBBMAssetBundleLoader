@@ -1,5 +1,6 @@
 ﻿using Flash2;
 using Framework;
+using System;
 using System.Collections.Generic;
 using UnhollowerRuntimeLib;
 using UnityEngine;
@@ -111,7 +112,9 @@ namespace SMBBMFileRedirector
             {
                 // Initialize our new cue sheet mappings (used if we inject a new cue sheet)
                 newCueSheetMapping = new();
-                int newEnumKeyValue = 0x65;
+                
+                // Figure out what the next valid Enum int value is in case we inject one
+                int newEnumKeyValue = Enum.GetValues(typeof(sound_id.cuesheet)).Length;
 
                 // Go through every cue sheet mapping we have configured
                 foreach (KeyValuePair<string, CueSheetDef> cueSheet in Plugin.cueSheets)
