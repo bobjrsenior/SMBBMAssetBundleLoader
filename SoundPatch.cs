@@ -20,7 +20,7 @@ namespace SMBBMFileRedirector
                 {
                     // Make sure the dependency isn't already loading or loaded
                     Sound.cuesheet_param_t cueSheetInfo = __instance.m_cueSheetParamDict[dependsOn];
-                    if (!cueSheetInfo.isLoading && !cueSheetInfo.isLoaded)
+                    if (!cueSheetInfo.isLoading && !cueSheetInfo.isLoaded && CueSheetRefCounter.AddReference(dependsOn))
                     {
                         // Load the dependency
                         Plugin.Log.LogDebug($"Method {System.Reflection.MethodBase.GetCurrentMethod().Name}: Loading {in_cueSheet}. Also loading {dependsOn} as a dependency");

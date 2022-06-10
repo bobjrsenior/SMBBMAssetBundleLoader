@@ -1,4 +1,6 @@
 ﻿using Flash2;
+using Framework;
+using System;
 using System.Collections.Generic;
 using UnhollowerRuntimeLib;
 using UnityEngine;
@@ -8,8 +10,9 @@ namespace SMBBMFileRedirector
 {
     internal class DelayedPatchHandler : MonoBehaviour
     {
-        private readonly float startupDelay = 1.0f;
+        private readonly float startupDelay = 0.5f;
         private float curDelay = 0.0f;
+        private bool initializedAssetBundles = false;
         private bool initializedCueSheets = false;
         private bool initializedCues = false;
         private bool initializedMovies = false;
@@ -29,6 +32,8 @@ namespace SMBBMFileRedirector
                 if (curDelay > startupDelay)
                 {
                     // Mkae sure the CueSheets are setup first in case a new one is injected
+                    if (!initializedAssetBundles)
+                        InitializeAssetBundles();
                     if (!initializedCueSheets)
                         InitializeCueSheet();
                     if (initializedCueSheets && !initializedCues)
@@ -41,7 +46,60 @@ namespace SMBBMFileRedirector
 
         private bool FullyInitialized()
         {
-            return initializedCueSheets && initializedCues && initializedMovies;
+            return initializedAssetBundles && initializedCueSheets && initializedCues && initializedMovies;
+        }
+
+        /// <summary>
+        /// Very Experimental
+        /// </summary>
+        private void InitializeAssetBundles()
+        {
+            initializedAssetBundles = true;
+
+            Il2CppSystem.Collections.Generic.Dictionary<string, string> pathToAssetBundleDict = AssetBundleCache.Instance.m_pathToAssetBundleNameDict;
+            if (pathToAssetBundleDict != null && AssetBundleCache.Instance.m_isReady)
+            {
+                foreach (KeyValuePair<string, string> assetToAssetBundle in Plugin.assetToAssetBundles)
+                {
+                    if (pathToAssetBundleDict.ContainsKey(assetToAssetBundle.Key))
+                    {
+                        // Determine if we are redirecting to a new bundle or an existing one
+                        string oldAssetBundle = pathToAssetBundleDict[assetToAssetBundle.Key];
+                        pathToAssetBundleDict[assetToAssetBundle.Key] = assetToAssetBundle.Value;
+                        Plugin.Log.LogDebug($"Redirected Asset {assetToAssetBundle.Key} to Asset Bundle {assetToAssetBundle.Value}");
+
+                        // Now add the new dependency
+                        if (!AssetBundleCache.Instance.m_assetBundleDependencyDict.ContainsKey(oldAssetBundle))
+                        {
+                            AssetBundleCache.Instance.m_assetBundleDependencyDict.Add(oldAssetBundle, new());
+                            Plugin.Log.LogDebug($"Added dep list to {oldAssetBundle} since it didn't have one");
+                        }
+                        if (!AssetBundleCache.Instance.m_assetBundleDependencyDict[oldAssetBundle].Contains(assetToAssetBundle.Value))
+                        {
+                            AssetBundleCache.Instance.m_assetBundleDependencyDict[oldAssetBundle].Add(assetToAssetBundle.Value);
+                            Plugin.Log.LogDebug($"Added {assetToAssetBundle.Value} as a dependency to {oldAssetBundle}");
+
+                        }
+                        // See if the new asset bundle exists yet
+                        if (!AssetBundleCache.Instance.m_assetBundleDependencyDict.ContainsKey(assetToAssetBundle.Value))
+                        {
+                            AssetBundleCache.Instance.m_assetBundleDependencyDict.Add(assetToAssetBundle.Value, new());
+                            AssetBundleCache.Instance.m_assetBundleDependencyDict[assetToAssetBundle.Value].Add(oldAssetBundle);
+                            Plugin.Log.LogDebug($"Added {assetToAssetBundle.Value} to the dep dict with a dep on {oldAssetBundle}");
+                        }
+                    }
+                    else
+                    {
+                        // Can't redsirect since the original asset doesn't exist
+                        Plugin.Log.LogDebug($"Can't find Asset {assetToAssetBundle.Key} in Asset list");
+                    }
+                }
+            }
+            else
+            {
+                initializedAssetBundles = false;
+            }
+
         }
 
         private void InitializeCueSheet()
@@ -54,7 +112,9 @@ namespace SMBBMFileRedirector
             {
                 // Initialize our new cue sheet mappings (used if we inject a new cue sheet)
                 newCueSheetMapping = new();
-                int newEnumKeyValue = 0x65;
+                
+                // Figure out what the next valid Enum int value is in case we inject one
+                int newEnumKeyValue = Enum.GetValues(typeof(sound_id.cuesheet)).Length;
 
                 // Go through every cue sheet mapping we have configured
                 foreach (KeyValuePair<string, CueSheetDef> cueSheet in Plugin.cueSheets)

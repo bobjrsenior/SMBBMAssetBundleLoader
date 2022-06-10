@@ -1,0 +1,29 @@
+{
+    "name": "Bob's Asset Pack Example",
+    "description": "This pack serves as an example of how to make a configuration file for SMBBM FileRedirector",
+    "author": "bobjrsenior",
+    "file_format_version": 2,
+    "asset_bundles": {
+        "ui_sel_logo_en": "AssetBundle/Bobs_Asset_Pack_Example/ui_sel_logo_en"
+    },
+    "cue_sheets": {
+        "adv": {
+            "acb": "Sound/Bobs_Asset_Pack_Example/adv.acb",
+            "awb": "Sound/Bobs_Asset_Pack_Example/adv.awb"
+        },
+        "selector": {
+            "acb": "Sound/Bobs_Asset_Pack_Example/selector.acb",
+            "awb": "Sound/Bobs_Asset_Pack_Example/selector.awb"
+        },
+        "custom_cue_sheet": {
+            "acb": "Sound/Bobs_Asset_Pack_Example/custom_cue_sheet.acb"
+        }
+    },
+    "cue_to_cue_sheet": {
+        "se_com_select": "custom_cue_sheet"
+    },
+    "movies": {
+        "S01_A.usm": "Movie/SMB2 Cutscenes/S01_A.usm",
+        "S01_B.usm": "Movie/SMB2 Cutscenes/S01_B.usm"
+    }
+}
