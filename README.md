@@ -96,6 +96,16 @@ Going into more detail, here are descriptions for each field in the configuratio
 
 To see example configurations and explanations, see [Examples](/Examples).
 
+## Asset Names
+
+To redirect things, you need the name. This repo has a list of the different names for convenience.
+
+The links to them are:
+* [AssetBundles](/Game_Constants/AssetBundles.txt)
+* [Cue Sheets](/Game_Constants/CueSheets.txt)
+* [Cues](/Game_Constants/Cues.txt)
+* [Moves](/Game_Constants/Movies.txt)
+
 ## Building
 
 ## Setup
