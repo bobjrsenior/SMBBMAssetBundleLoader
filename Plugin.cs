@@ -41,6 +41,13 @@ namespace SMBBMFileRedirector
         internal static Dictionary<string, string> assetBundles;
 
         /// <summary>
+        /// A Key/Value map of Assets to AssetBundles
+        /// Key: Asset name
+        /// Value: Asset Bundle to redirect it to
+        /// </summary>
+        internal static Dictionary<string, string> assetToAssetBundles;
+
+        /// <summary>
         /// A Key/Value map of CueSheets to patch
         /// Key: Cue Sheet name
         /// Value: Path to the Cue Sheet to patch it with
@@ -88,6 +95,7 @@ namespace SMBBMFileRedirector
 
             // Find and load all the configuration JSON files
             assetBundles = new();
+            assetToAssetBundles = new();
             cueSheets = new();
             cueToCueSheets = new();
             cueSheetDependency = new();
@@ -108,6 +116,12 @@ namespace SMBBMFileRedirector
                     dict += $"\"{assetBundle.Key}\", \"{assetBundle.Value}\"\n";
                 }
                 Log.LogDebug($"Final Asset Bundle List JSON is {{{dict}}}");
+                dict = "";
+                foreach (KeyValuePair<string, string> assetToAssetBundle in assetToAssetBundles)
+                {
+                    dict += $"\"{assetToAssetBundle.Key}\", \"{assetToAssetBundle.Value}\"\n";
+                }
+                Log.LogDebug($"Final Asset->Asset Bundle Mapping List JSON is {{{dict}}}");
                 dict = "";
                 foreach (KeyValuePair<string, CueSheetDef> cueSheet in cueSheets)
                 {
@@ -160,6 +174,7 @@ namespace SMBBMFileRedirector
                 JObject obj = JToken.ReadFrom(reader) as JObject;
                 ReplacementDef replacementDef = obj.ToObject<ReplacementDef>();
                 MergeAssetBundles(replacementDef.asset_bundles);
+                MergeAssetToAssetBundles(replacementDef.asset_to_asset_bundles);
                 MergeCueSheets(replacementDef.cue_sheets);
                 MergeCueToCueSheets(replacementDef.cue_to_cue_sheet);
                 MergeMovies(replacementDef.movies);
@@ -178,6 +193,21 @@ namespace SMBBMFileRedirector
                 foreach (KeyValuePair<string, string> assetBundle in newAssetBundles)
                 {
                     assetBundles[assetBundle.Key] = $"{dataDir}{Path.DirectorySeparatorChar}{assetBundle.Value}";
+                }
+            }
+        }
+
+        /// <summary>
+        /// Merges a dictionary of Asset->Asset Bundle mappings with the current Asset->Asset Bundle Key/Value mappings
+        /// </summary>
+        /// <param name="newAssetToAssetBundles">Asset->Asset Bundle mappings to merge</param>
+        internal void MergeAssetToAssetBundles(Dictionary<string, string> newAssetToAssetBundles)
+        {
+            if (newAssetToAssetBundles != null)
+            {
+                foreach (KeyValuePair<string, string> assetToAssetBundle in newAssetToAssetBundles)
+                {
+                    assetToAssetBundles[assetToAssetBundle.Key] = $"{dataDir}{Path.DirectorySeparatorChar}{assetToAssetBundle.Value}";
                 }
             }
         }
@@ -206,13 +236,13 @@ namespace SMBBMFileRedirector
         /// Merges a dictionary of Cue->Cue Sheet mappings with the current Cue->Cue Sheet Key/Value mappings
         /// </summary>
         /// <param name="newCueToCueSheet">Cue->CueSheet mappings to merge</param>
-        internal void MergeCueToCueSheets(Dictionary<string, string> newCueToCueSheet)
+        internal void MergeCueToCueSheets(Dictionary<string, string> newCueToCueSheets)
         {
-            if (newCueToCueSheet != null)
+            if (newCueToCueSheets != null)
             {
-                foreach (KeyValuePair<string, string> cueToCueShe in newCueToCueSheet)
+                foreach (KeyValuePair<string, string> cueToCueSheet in newCueToCueSheets)
                 {
-                    cueToCueSheets[cueToCueShe.Key] = cueToCueShe.Value;
+                    cueToCueSheets[cueToCueSheet.Key] = cueToCueSheet.Value;
                 }
             }
         }
