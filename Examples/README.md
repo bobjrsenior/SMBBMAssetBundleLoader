@@ -4,6 +4,8 @@ This folder contains 2 example JSON configuration files: Bobs_Asset_Pack_Example
 
 ## Bobs_Asset_Pack_Example.json
 
+To install this example, copy Bobs_Asset_Pack_Example.json, the AssetBundle folder, and the Sound folder to "UserData/FileReplacements/" in your game directory. 
+
 ```json
 {
   "name": "Bob's Asset Pack Example",
@@ -89,7 +91,10 @@ With this strategy, you can have many different audio packs modifying different 
 
 Unfortunately I don't know how to make the game video (.usm) files myself so this example uses an existing mod called ["Super Monkey Ball 2 Cutscenes"](https://gamebanana.com/mods/327155).
 
-As an extra step to use this configuration, you need to download the "Super Monkey Ball 2 Cutscenes" mod and put the .usm files from it into the "Movie/SMB2 Cutscenes/" folder yourself.
+To install this example:
+1. Copy SMB2 Cutscenes.json and the Movie folder to "UserData/FileRedirections/" in your game directory.
+2. Download ["Super Monkey Ball 2 Cutscenes"](https://gamebanana.com/mods/327155)
+3. Copy the .usm files from "Super Monkey Ball 2 Cutscenes" into the "UserData/FileReplacements/Movie/SMB2 Cutscenes/" folder.
 
 ```json
 {
@@ -122,4 +127,4 @@ As an extra step to use this configuration, you need to download the "Super Monk
 }
 ```
 
-The "SMB2 Cutscenes.json" utilizes the "movies" field and redirects every default .usm movie file to custom ones stored in"UserData/FileReplacements/Movie/SMB2 Cutscenes".
+The "SMB2 Cutscenes.json" utilizes the "movies" field and redirects every default .usm movie file to custom ones stored in "UserData/FileReplacements/Movie/SMB2 Cutscenes".
