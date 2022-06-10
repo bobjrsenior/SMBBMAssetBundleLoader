@@ -66,9 +66,9 @@ This simply redirects the ui_sel_logo_en AssetBundle to a custom one stored at "
 
 Each object in cue_sheets should be the name of a Cue Sheet. In this example, that would be "adv", "selector", and "custom_cue_sheet".
 
-If you specify a Cue Sheet that does not exist in the game, it will be injected into the game's list of Cue Sheets (why you would do this is explaned in the next section.
+If you specify a Cue Sheet that does not exist in the game ("custom_cue_sheet" in the above example), it will be injected into the game's list of Cue Sheets (why you would do this is explaned in the next section.
 
-Cue Sheets can be composed of both acb and awb files. Because of that, for each Cue Sheet you specify, you can provide an acb filepath and an awb filepath. The awb filepath is optional since not every Cue Sheet has one. This will redirect the Cue Sheet file location to your custom one.
+Cue Sheets can be composed of both acb and awb files. Because of that, for each Cue Sheet you specify, you can provide an acb filepath and an awb filepath (awb is optional since not every Cue Sheet has it). This entries redirect the Cue Sheet file location to your custom one.
 
 ### cue_to_cue_sheet
 
