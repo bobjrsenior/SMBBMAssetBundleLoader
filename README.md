@@ -92,17 +92,9 @@ Going into more detail, here are descriptions for each field in the configuratio
 | cue_to_cue_sheet    | (Advanced) A dictionary of key value pairs. Each key is the name of a Cue (ex: "se_com_select") and each value is a Cue Sheet to redirect the Cue to. Example: If you wanted to redirect the "se_com_select" Cue to the Cue Sheet "custom_cue_sheet" you would put `"se_com_select": "custom_cue_sheet"`. This is mainly useful to replace individual Cues in a larger Cue Sheet.   |
 | movies              | A dictionary of key value pairs. Each Key should be the name of an existing SMBBM Movie (ex: "S01_A.usm"). Each value should be the relative path to your replacement movie. Example: If your replacement movie for "S01_A.usm" was "UserData/FileReplacements/Movie/MyAwesomeAssets/S01_A.usm", you would put `"S01_A.usm": "Movie/MyAwesomeAssets/S01_A.usm"` for one of the entries      |
 
-## Example Configuration
+## Example Configurations
 
-To test the mod and create an example of a larger asset pack, I created a [configuration file](https://gist.github.com/bobjrsenior/68975daaef0737fa2e5a39289d747c60) for iswimfly's [Invisiball mod](https://gamebanana.com/mods/367723).
-
-1. Copy the configuration file in "UserData\AssetBundles" 
-2. Copy the "Invisiball BM" folder from Invisiball's release to "UserData\AssetBundles"
-3. Start the game and it should patch in all of the Invisiball custom assets
-
-## Examples and Advanced Configuration
-
-To see example configurations and advanced setup descriptions, see [TBD]()
+To see example configurations and explanations, see [Examples](/Examples).
 
 ## Building
 
