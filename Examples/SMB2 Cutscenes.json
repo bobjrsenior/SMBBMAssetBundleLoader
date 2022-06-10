@@ -1,0 +1,28 @@
+{
+  "name": "Super Monkey Ball 2 Cutscenes",
+  "description": "Replaces all cutscenes in the game with those from Super Monkey Ball 2",
+  "author": "Minaline",
+  "file_format_version": 1,
+  "movies": {
+    "S01_A.usm": "Movie/SMB2 Cutscenes/S01_A.usm",
+    "S01_B.usm": "Movie/SMB2 Cutscenes/S01_B.usm",
+    "S02_A.usm": "Movie/SMB2 Cutscenes/S02_A.usm",
+    "S02_B.usm": "Movie/SMB2 Cutscenes/S02_B.usm",
+    "S03_A.usm": "Movie/SMB2 Cutscenes/S03_A.usm",
+    "S03_B.usm": "Movie/SMB2 Cutscenes/S03_B.usm",
+    "S04_A.usm": "Movie/SMB2 Cutscenes/S04_A.usm",
+    "S04_B.usm": "Movie/SMB2 Cutscenes/S04_B.usm",
+    "S05_A.usm": "Movie/SMB2 Cutscenes/S05_A.usm",
+    "S05_B.usm": "Movie/SMB2 Cutscenes/S05_B.usm",
+    "S06_B.usm": "Movie/SMB2 Cutscenes/S06_B.usm",
+    "S06_A.usm": "Movie/SMB2 Cutscenes/S06_A.usm",
+    "S07_B.usm": "Movie/SMB2 Cutscenes/S07_B.usm",
+    "S07_A.usm": "Movie/SMB2 Cutscenes/S07_A.usm",
+    "S08_B.usm": "Movie/SMB2 Cutscenes/S08_B.usm",
+    "S08_A.usm": "Movie/SMB2 Cutscenes/S08_A.usm",
+    "S09_B.usm": "Movie/SMB2 Cutscenes/S09_B.usm",
+    "S09_A.usm": "Movie/SMB2 Cutscenes/S09_A.usm",
+    "S10_B.usm": "Movie/SMB2 Cutscenes/S10_B.usm",
+    "S10_A.usm": "Movie/SMB2 Cutscenes/S10_A.usm"
+  }
+}
