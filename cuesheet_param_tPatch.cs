@@ -21,10 +21,9 @@ namespace SMBBMFileRedirector
                 {
                     // Make sure the dependency isn't already unloaded
                     Sound.cuesheet_param_t cueSheetInfo = Sound.Instance.m_cueSheetParamDict[dependsOn];
-                    if (!cueSheetInfo.isLoaded)
+                    if (!cueSheetInfo.isLoaded && CueSheetRefCounter.RemoveReference(dependsOn))
                     {
-                        // Unload the dependency (TODO This could cause issues is a cue is redirected to another base game cue sheet)
-                        Plugin.Log.LogInfo($"Method {System.Reflection.MethodBase.GetCurrentMethod().Name}: Unloading {in_cueSheet}. Also unloading {dependsOn} as a dependency");
+                        Plugin.Log.LogDebug($"Method {System.Reflection.MethodBase.GetCurrentMethod().Name}: Unloading {in_cueSheet}. Also unloading {dependsOn} as a dependency");
                         Sound.Instance.LoadCueSheetASync(dependsOn);
                     }
                 }
