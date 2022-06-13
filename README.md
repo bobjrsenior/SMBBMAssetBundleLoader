@@ -40,9 +40,9 @@ Here is what the plugin resources should look like:
 
 ## Using The Plugin
 
-This Plugin uses JSON files to configure what AssetBundles should be patched. The Plugin looks for these JSON files under the "UserData/FileReplacements" directory within your games install folder.
+This Plugin uses JSON files to configure what game Assets should be patched. The Plugin looks for these JSON files under the "UserData/FileReplacements" directory within your games install folder.
 
-It is good practice to name your configuration file after you custom file pack.
+It is good practice to name your configuration file after your custom file pack.
 
 For example, if you wanted a custom Asset Bundle pack called "MyAwesomeAssets", you could make your configuration file "MyAwesomeAssets.json". Additionally, please place your custom AssetBundles within a folder under "UserData/FileReplacements". For the "MyAwesomeAssets" example, it would be a folder called "UserData/FileReplacements/MyAwesomeAssets". To keep Asset types organized like the game does, you could also choose "UserData/FileReplacements/AssetBundle/MyAwesomeAssets".
 
