@@ -1,6 +1,8 @@
 # SMBBM FileRedirector
 
-A BepInEx plugin for Super Monkey Ball Banana Mania designed to allow redirecting game assets to custom ones without overwriting base game files.
+A plugin for Super Monkey Ball Banana Mania designed to allow redirecting game assets to custom ones without overwriting base game files.
+
+This plugin supports BOTH Banana Mod Manager (BMM) and BepInEx.
 
 Notes:
 
@@ -9,7 +11,13 @@ Notes:
 3. This mod currently only supports redirecting whole AssetBundles, not indiviual prefabs/etc within an AssetBundle. There is technically experimental support included but don't expect it to work (the game will probably soft lock on a loading screen)
 4. This mod does allow redirecting individual audio Cues within a Cue Sheet with more advanced setup
 
-## Intallation
+## Installing for Banana Mod Manager
+
+1. Download the SMBBMFileRedirector.BMM.zip file from the Releases page
+2. Extract it in your main game folder (the zip file structure should put the plugin in the right place)
+3. Enable it within BMM
+
+## Installing for BepInEx (Required if running through wine/proton)
 
 ### Installing BepInEx
 
@@ -24,19 +32,8 @@ This plugin uses [BepInEx](https://github.com/BepInEx/BepInEx) as a mod loader s
 
 ## Installing This Plugin
 
-1. Download the SMBBMAssetBundleLoader.zip file from the Releases page
+1. Download the SMBBMFileRedirector.BepInEx.zip file from the Releases page
 2. Extract it in your main game folder (the zip file structure should put the plugin in the right place)
-
-## Plugin Contents
-
-Here is what the plugin resources should look like:
-
-```
-├── SMBBMFileRedirector
-│   ├── Newtonsoft.Json.dll
-│   ├── Newtonsoft.Json.LICENSE.md
-│   └── SMBBMAssetBundleLoader.dll
-```
 
 ## Using The Plugin
 
@@ -110,12 +107,15 @@ The links to them are:
 
 ## Setup
 
-I use Visual Studio 2022  for development although I beleive it can also be compiled via command line. Additionally, make sure you setup your enviroment for BepInEx plugin development: https://docs.bepinex.dev/master/articles/dev_guide/plugin_tutorial/1_setup.html
+I use Visual Studio 2022  for development although I beleive it can also be compiled via command line. Additionally, make sure you setup your enviroment for BepInEx plugin development if building for BepInEx: https://docs.bepinex.dev/master/articles/dev_guide/plugin_tutorial/1_setup.html
 
 ## Configuration
 
-In the .csproj, there is an element called `<SMBBMDir>`. You should edit this to point to your game installation. The project references are determined based on that. You will need to have run your game at least once with BepInEx installed for the references to be populated on disk.
+In the .csproj, there is an element called `<SMBBMDir>` and `<SMBDirBep>`. If building for BMM, you should edit `<SMBBMDir>` to point to your game installation where BMM is installed. If building for BepInEx, you should edit `<SMBBMDir>` to point to your game installation where BMM is installed. The project references are determined based on that.
 
-## Post-build event
+There are 2 Visual Studio build configurations:
 
-The project includes Post-build events that will automatically copy the plugin into "$(SMBBMDir)\BepInEx\plugins". That way you can immediately run the game after building is complete for testing.
+1. Release_BMM: Builds a DLL for Banana Mod Manager
+2. Release_BepInEx: Builds a DLL for BepInEx
+
+Make sure you use the right configuration for your mod loader.
