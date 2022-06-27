@@ -1,23 +1,49 @@
 ﻿using Framework;
 using HarmonyLib;
+using System;
+using System.IO;
+using UnhollowerBaseLib;
+using UnhollowerBaseLib.Runtime;
+using UnhollowerRuntimeLib;
+
 
 namespace SMBBMFileRedirector
 {
-    [HarmonyPatch(typeof(AssetBundleCache))]
     public class AssetBundleCachePatch
     {
-        [HarmonyPrefix]
-        [HarmonyPatch(nameof(AssetBundleCache.get_streaming_asset_fullpath_crifs),
-    new[] { typeof(string) })]
-        static bool get_streaming_asset_fullpath_crifs_String(ref string __result, string in_fileName)
+        // BMM doesn't support IL2CPP Harmony Patches
+        // So we a Detour instead
+        private delegate IntPtr get_streaming_asset_fullpath_crifs_delegate(IntPtr in_fileName);
+        private static get_streaming_asset_fullpath_crifs_delegate get_streaming_asset_fullpath_crifs_delegate_instance;
+        private static get_streaming_asset_fullpath_crifs_delegate get_streaming_asset_fullpath_crifs_delegate_original;
+
+        private static readonly string StreamingAssetsSubPath = $"smbbm_Data{Path.DirectorySeparatorChar}StreamingAssets{Path.DirectorySeparatorChar}StandaloneWindows64{Path.DirectorySeparatorChar}AssetBundles";
+        private static string assetBundleDir;
+
+        public static unsafe void CreateDetour()
         {
-            if (Plugin.assetBundles.ContainsKey(in_fileName))
+            get_streaming_asset_fullpath_crifs_delegate_instance = get_streaming_asset_fullpath_crifs_detour;
+
+            assetBundleDir = $"{PluginResourcesFileRedirector.Instance.gameRootPath}{Path.DirectorySeparatorChar}{StreamingAssetsSubPath}";
+
+            var original = typeof(AssetBundleCache).GetMethod(nameof(AssetBundleCache.get_streaming_asset_fullpath_crifs), AccessTools.all);
+            var methodInfo = UnityVersionHandler.Wrap((Il2CppMethodInfo*)(IntPtr)UnhollowerUtils.GetIl2CppMethodInfoPointerFieldForGeneratedMethod(original).GetValue(null));
+
+            get_streaming_asset_fullpath_crifs_delegate_original = ClassInjector.Detour.Detour(methodInfo.MethodPointer,
+                               get_streaming_asset_fullpath_crifs_delegate_instance);
+        }
+
+        static IntPtr get_streaming_asset_fullpath_crifs_detour(IntPtr in_fileName)
+        {
+            string filename = new Il2CppSystem.String(in_fileName);
+
+            // Return our redirect if we have one
+            if (PluginResourcesFileRedirector.Instance.assetBundles.ContainsKey(filename))
             {
-                __result = Plugin.assetBundles[in_fileName];
-                Plugin.Log.LogDebug($"Patched AssetBundle {in_fileName} with filepath: {__result}");
-                return false;
+                return ((Il2CppSystem.String)PluginResourcesFileRedirector.Instance.assetBundles[filename]).Pointer;
             }
-            return true;
+            // Otherwise let the original method handle it
+            return get_streaming_asset_fullpath_crifs_delegate_original(in_fileName);
         }
     }
 }

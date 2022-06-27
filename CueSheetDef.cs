@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SMBBMFileRedirector
+﻿namespace SMBBMFileRedirector
 {
     internal class CueSheetDef
     {
-        public string acb;
-        public string awb = "";
+        public string acb { get; set; }
+        public string awb { get; set; } = "";
     }
 }

@@ -4,50 +4,96 @@
 		<TargetFramework>netstandard2.1</TargetFramework>
 		<AssemblyName>SMBBMFileRedirector</AssemblyName>
 		<BepInExPluginGuid>com.bobjrsenior.SMBBMFileRedirector</BepInExPluginGuid>
-		<Description>A plugin to help with loading custom asset files without modifying base game assets. It works by redirecting the games to load files in a different location.</Description>
+		<Description>A plugin to help with loading custom asset files without modifying base game assets. It works by redirecting the game to load files in a different location.</Description>
 		<Version>2.0.0</Version>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<LangVersion>latest</LangVersion>
-		<SMBBMDir>Z:\smbbm</SMBBMDir>
+		<SMBBMDir>C:\Program Files (x86)\Steam\steamapps\common\smbbm</SMBBMDir>
+		<SMBBMBepDir>Z:\smbbm</SMBBMBepDir>
 		<CopyLocalLockFileAssemblies>True</CopyLocalLockFileAssemblies>
+		<Configurations>BMM;BepInEx</Configurations>
 	</PropertyGroup>
 
-	<ItemGroup>
+	<!-- BEPINEX IL2CPP -->
+	<PropertyGroup Condition="'$(Configuration)'=='BepInEx'">
+		<OutputPath>bin\BepInEx\</OutputPath>
+		<DefineConstants>BIE</DefineConstants>
+	</PropertyGroup>
+
+	<!-- Banana Mod Manager -->
+	<PropertyGroup Condition="'$(Configuration)'=='BMM'">
+		<OutputPath>bin\BMM\</OutputPath>
+		<DefineConstants>BMM</DefineConstants>
+	</PropertyGroup>
+
+	<ItemGroup Condition="'$(Configuration)'=='BepInEx'">
 		<PackageReference Include="BepInEx.IL2CPP" Version="6.0.0-*" IncludeAssets="compile" />
 		<PackageReference Include="BepInEx.PluginInfoProps" Version="1.*" />
-		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="System.Text.Json" Version="6.0.5" IncludeAssets="compile" />
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(Configuration)'=='BMM'">
 		<Reference Include="Assembly-CSharp">
-			<HintPath>$(SMBBMDir)\BepInEx\unhollowed\Assembly-CSharp.dll</HintPath>
+			<HintPath>$(SMBBMDir)\managed\Assembly-CSharp.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
 		<Reference Include="Assembly-CSharp">
-			<HintPath>$(SMBBMDir)\BepInEx\unhollowed\Assembly-CSharp-firstpass.dll</HintPath>
+			<HintPath>$(SMBBMDir)\managed\Assembly-CSharp-firstpass.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
 		<Reference Include="Il2Cppmscorlib">
-			<HintPath>$(SMBBMDir)\BepInEx\unhollowed\Il2Cppmscorlib.dll</HintPath>
-			<Private>False</Private>
-		</Reference>
-		<Reference Include="SMBBMLeaderboardDisabler">
-			<HintPath>Z:\smbbm\BepInEx\plugins\SMBBMLeaderboardDisabler.dll</HintPath>
+			<HintPath>$(SMBBMDir)\managed\Il2Cppmscorlib.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
 		<Reference Include="UnityEngine.CoreModule">
-			<HintPath>$(SMBBMDir)\BepInEx\unhollowed\UnityEngine.CoreModule.dll</HintPath>
+			<HintPath>$(SMBBMDir)\managed\UnityEngine.CoreModule.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="UnhollowerBaseLib">
+			<HintPath>$(SMBBMDir)\managed\UnhollowerBaseLib.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="UnhollowerRuntimeLib">
+			<HintPath>$(SMBBMDir)\managed\UnhollowerRuntimeLib.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="HarmonyLib">
+			<HintPath>$(SMBBMDir)\0Harmony.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
 	</ItemGroup>
 
-	<ItemGroup>
-		<None Update="Newtonsoft.Json.LICENSE.md">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</None>
+	<ItemGroup Condition="'$(Configuration)'=='BepInEx'">
+		<Reference Include="Assembly-CSharp">
+			<HintPath>$(SMBBMBepDir)\BepInEx\unhollowed\Assembly-CSharp.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="Assembly-CSharp">
+			<HintPath>$(SMBBMBepDir)\BepInEx\unhollowed\Assembly-CSharp-firstpass.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="Il2Cppmscorlib">
+			<HintPath>$(SMBBMBepDir)\BepInEx\unhollowed\Il2Cppmscorlib.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="SMBBMLeaderboardDisabler">
+			<HintPath>$(SMBBMBepDir)\BepInEx\plugins\SMBBMLeaderboardDisabler.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="UnityEngine.CoreModule">
+			<HintPath>$(SMBBMBepDir)\BepInEx\unhollowed\UnityEngine.CoreModule.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="JsonLibs">
+			<HintPath>$(SMBBMBepDir)\BepInEx\plugins\JsonLibs\JsonLibs.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
 	</ItemGroup>
 
-	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-		<Exec Command="xcopy &quot;$(TargetDir)*.dll&quot; &quot;$(TargetDir)$(AssemblyName)&quot; /y /i&#xD;&#xA;xcopy &quot;$(TargetDir)*.md&quot; &quot;$(TargetDir)$(AssemblyName)&quot; /y /i&#xD;&#xA;xcopy &quot;$(TargetDir)$(AssemblyName)\*.*&quot; &quot;$(SMBBMDir)\BepInEx\plugins\$(AssemblyName)&quot; /y /i" />
+	<Target Name="CopyCustomContent" AfterTargets="AfterBuild" Condition="'$(Configuration)'=='BMM'">
+		<Copy SourceFiles="BMMPluginWrapper\mod.json" DestinationFolder="$(OutDir)" />
 	</Target>
 </Project>

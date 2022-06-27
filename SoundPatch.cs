@@ -1,19 +1,37 @@
 ﻿using Flash2;
 using HarmonyLib;
+using System;
+using UnhollowerBaseLib;
+using UnhollowerBaseLib.Runtime;
+using UnhollowerRuntimeLib;
 
 namespace SMBBMFileRedirector
 {
-    [HarmonyPatch(typeof(Sound))]
     public class SoundPatch
     {
-        [HarmonyPrefix]
-        [HarmonyPatch(nameof(Sound.LoadCueSheetASync),
-    new[] { typeof(sound_id.cuesheet) })]
-        static bool LoadCueSheetASync(Sound __instance, sound_id.cuesheet in_cueSheet)
+        // BMM doesn't support IL2CPP Harmony Patches
+        // So we a Detour instead
+        private delegate void LoadCueSheetASyncDelegate(IntPtr _thisPtr, sound_id.cuesheet in_cueSheet);
+        private static LoadCueSheetASyncDelegate LoadCueSheetASyncInstance;
+        private static LoadCueSheetASyncDelegate LoadCueSheetASyncdDelegateOriginal;
+        public static unsafe void CreateDetour()
         {
+            LoadCueSheetASyncInstance = LoadCueSheetASync;
+
+            var original = typeof(Sound).GetMethod(nameof(Sound.LoadCueSheetASync), AccessTools.all);
+            var methodInfo = UnityVersionHandler.Wrap((Il2CppMethodInfo*)(IntPtr)UnhollowerUtils.GetIl2CppMethodInfoPointerFieldForGeneratedMethod(original).GetValue(null));
+
+            LoadCueSheetASyncdDelegateOriginal = ClassInjector.Detour.Detour(methodInfo.MethodPointer,
+                               LoadCueSheetASyncInstance);
+        }
+
+        static void LoadCueSheetASync(IntPtr _thisPtr, sound_id.cuesheet in_cueSheet)
+        {
+            Sound __instance = new(_thisPtr);
+
             // See if we have a dependency saved for this cuesheet
             sound_id.cuesheet dependsOn;
-            if (Plugin.cueSheetDependency.TryGetValue(in_cueSheet, out dependsOn))
+            if (PluginResourcesFileRedirector.Instance.cueSheetDependency.TryGetValue(in_cueSheet, out dependsOn))
             {
                 // Get the dependencies cuesheet info
                 if (in_cueSheet != dependsOn && __instance.m_cueSheetParamDict.ContainsKey(dependsOn))
@@ -23,12 +41,12 @@ namespace SMBBMFileRedirector
                     if (!cueSheetInfo.isLoading && !cueSheetInfo.isLoaded && CueSheetRefCounter.AddReference(dependsOn))
                     {
                         // Load the dependency
-                        Plugin.Log.LogDebug($"Method {System.Reflection.MethodBase.GetCurrentMethod().Name}: Loading {in_cueSheet}. Also loading {dependsOn} as a dependency");
+                        PluginResourcesFileRedirector.Instance.PluginLogger.LogDebug($"Method {System.Reflection.MethodBase.GetCurrentMethod().Name}: Loading {in_cueSheet}. Also loading {dependsOn} as a dependency");
                         __instance.LoadCueSheetASync(dependsOn);
                     }
                 }
             }
-            return true;
+            LoadCueSheetASyncdDelegateOriginal(_thisPtr, in_cueSheet);
         }
 
         /* 
