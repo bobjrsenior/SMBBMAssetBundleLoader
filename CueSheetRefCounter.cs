@@ -52,7 +52,7 @@ namespace SMBBMFileRedirector
             }
             else
             {
-                Plugin.Log.LogDebug($"Method {System.Reflection.MethodBase.GetCurrentMethod().Name}: Trying to remove ref for CueSheet {cueSheet} but it isn't tracked!");
+                PluginResourcesFileRedirector.Instance.PluginLogger.LogDebug($"Method {System.Reflection.MethodBase.GetCurrentMethod().Name}: Trying to remove ref for CueSheet {cueSheet} but it isn't tracked!");
                 return false;
             }
         }

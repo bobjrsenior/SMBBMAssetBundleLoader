@@ -1,0 +1,10 @@
+{
+  "Title": "SMBBM File Redirector",
+  "Id": "com.bobjrsenior.SMBBMFileRedirector",
+  "DLLFile": "SMBBMFileRedirector.dll",
+  "Description": "A plugin to help with loading custom asset files without modifying base game assets. It works by redirecting the game to load files in a different location.",
+  "Version": "2.1.0",
+  "Date": "06/27/2022",
+  "Author": "bobjrsenior",
+  "AuthorURL": "https://github.com/bobjrsenior/SMBBMFileRedirector"
+}
