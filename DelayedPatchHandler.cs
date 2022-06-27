@@ -32,7 +32,7 @@ namespace SMBBMFileRedirector
         {
             // This delay is here in case all of the data isn't
             // initialized by frame 0
-            if (!FullyInitialized())
+            if (!initializedAssetBundles || !initializedCueSheets || !initializedCues || !initializedMovies)
             {
                 curDelay += Time.deltaTime;
                 if (curDelay > startupDelay)
@@ -48,11 +48,6 @@ namespace SMBBMFileRedirector
                         InitializeMovies();
                 }
             }
-        }
-
-        private bool FullyInitialized()
-        {
-            return initializedAssetBundles && initializedCueSheets && initializedCues && initializedMovies;
         }
 
         /// <summary>
