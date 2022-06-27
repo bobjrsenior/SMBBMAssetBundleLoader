@@ -1,4 +1,4 @@
-# SMBBM FileRedirector
+# SMBBM File Redirector
 
 A plugin for Super Monkey Ball Banana Mania designed to allow redirecting game assets to custom ones without overwriting base game files.
 
